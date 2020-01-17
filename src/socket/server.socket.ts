@@ -8,34 +8,39 @@ import {
 } from '@nestjs/websockets';
 import {Socket} from 'socket.io';
 import {Logger} from '@nestjs/common';
+import {DevicesService, DeviceType} from "./devices.service";
 
 @WebSocketGateway(10000)
 export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
-    private connections: Socket[] = [];
 
-    constructor(public logger: Logger) {
+    constructor(public logger: Logger, public devices: DevicesService) {
     }
 
-    @SubscribeMessage('PONG')
-    handlePong(@MessageBody() data: string,
-               @ConnectedSocket() client: Socket) {
-        this.logger.log('TRIGGER ON PONG');
+    @SubscribeMessage('REGISTER_DEVICE')
+    registerDevice(@MessageBody() data: any,
+                   @ConnectedSocket() client: Socket) {
+        this.logger.log('Client ' + client.id + ' is a ' + data.device_type);
+        switch (data.device_type) {
+            case 'TABLE':
+                this.devices.registerNewDeviceConnection(DeviceType.TABLE, client);
+                break;
+            case 'VR':
+                this.devices.registerNewDeviceConnection(DeviceType.VR, client);
+                break;
+            case 'TABLET':
+                this.devices.registerNewDeviceConnection(DeviceType.TABLET, client);
+                break;
+            default:
+                throw new Error("Unknown type of device");
+        }
     }
 
     handleConnection(client: Socket, ...args: any[]): any {
         this.logger.log(`New client with id ${client.id}`);
-        this.connections.push(client);
-        this.broadcast(client, 'PING', {id: client.id});
+        client.emit('REGISTRATION_ASK');
     }
 
     handleDisconnect(client: Socket): any {
-        this.connections.splice(this.connections.indexOf(client), 1);
-    }
-
-    private broadcast(emitter: Socket, eventName: string, data: any) {
-        this.connections.filter(con => con.id !== emitter.id).forEach(cli => {
-            this.logger.log('Emmit message to ' + cli.id + ' from ' + emitter.id);
-            cli.emit(eventName, data);
-        });
+        this.devices.removeConnection(client);
     }
 }
