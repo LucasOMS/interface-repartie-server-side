@@ -34,15 +34,24 @@ export class DevicesService {
     }
 
     sendToTable(eventName, data = undefined) {
-        this.tableConnection.emit(eventName, data);
+        if (this.tableConnection)
+            this.tableConnection.emit(eventName, data);
+        else
+            this.logger.error("Try to send a message to an unknown Table device");
     }
 
     sendToTablet(eventName, data = undefined) {
-        this.tabletConnection.emit(eventName, data);
+        if (this.tabletConnection)
+            this.tabletConnection.emit(eventName, data);
+        else
+            this.logger.error("Try to send a message to an unknown Tablet device");
     }
 
     sendToVr(eventName, data = undefined) {
-        this.vrConnection.emit(eventName, data);
+        if (this.vrConnection)
+            this.vrConnection.emit(eventName, data);
+        else
+            this.logger.error("Try to send a message to an unknown VR device");
     }
 
     registerNewDeviceConnection(type: DeviceType, client: Socket) {

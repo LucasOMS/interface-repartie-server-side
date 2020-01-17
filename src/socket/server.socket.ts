@@ -35,6 +35,12 @@ export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('EXPLORE_PLACE')
+    explorePlaceWithVr(@MessageBody() data: any) {
+        this.devices.sendToVr('EXPLORE_PLACE', {id_place: 1});
+        this.logger.log("Start exploring place 1 with VR");
+    }
+
     handleConnection(client: Socket, ...args: any[]): any {
         this.logger.log(`New client with id ${client.id}`);
         client.emit('REGISTRATION_ASK');
