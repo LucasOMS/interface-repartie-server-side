@@ -19,8 +19,12 @@ export class DevicesService {
 
     removeConnection(socket: Socket) {
         this.all_connections.splice(this.all_connections.indexOf(socket), 1);
-        if (this.tableConnection.id === socket.id) {
+        if (this.tableConnection && this.tableConnection.id === socket.id) {
             this.tableConnection = undefined;
+        } else if (this.tabletConnection && this.tabletConnection.id === socket.id) {
+            this.tabletConnection = undefined;
+        } else if (this.vrConnection && this.vrConnection.id === socket.id) {
+            this.vrConnection = undefined;
         }
     }
 
