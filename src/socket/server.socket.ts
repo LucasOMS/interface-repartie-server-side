@@ -23,12 +23,15 @@ export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
         switch (data.device_type) {
             case 'TABLE':
                 this.devices.registerNewDeviceConnection(DeviceType.TABLE, client);
+                this.devices.broadcastFrom(DeviceType.TABLE, 'DEVICE_CONNECTED', {device_type: 'TABLE'});
                 break;
             case 'VR':
                 this.devices.registerNewDeviceConnection(DeviceType.VR, client);
+                this.devices.broadcastFrom(DeviceType.VR, 'DEVICE_CONNECTED', {device_type: 'VR'});
                 break;
             case 'TABLET':
                 this.devices.registerNewDeviceConnection(DeviceType.TABLET, client);
+                this.devices.broadcastFrom(DeviceType.TABLET, 'DEVICE_CONNECTED', {device_type: 'TABLET'});
                 break;
             default:
                 throw new Error("Unknown type of device");
@@ -47,6 +50,17 @@ export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleDisconnect(client: Socket): any {
+        switch (this.devices.getDeviceType(client)) {
+            case DeviceType.TABLE:
+                this.devices.broadcastFrom(DeviceType.TABLE, 'DEVICE_DISCONNECTED', {device_type: 'TABLE'});
+                break;
+            case DeviceType.VR:
+                this.devices.broadcastFrom(DeviceType.VR, 'DEVICE_DISCONNECTED', {device_type: 'VR'});
+                break;
+            case DeviceType.TABLET:
+                this.devices.broadcastFrom(DeviceType.TABLET, 'DEVICE_DISCONNECTED', {device_type: 'TABLET'});
+                break;
+        }
         this.devices.removeConnection(client);
     }
 }

@@ -29,11 +29,11 @@ export class DevicesService {
     }
 
     broadcastFrom(type: DeviceType, eventName, data) {
-        if (type !== DeviceType.TABLE)
+        if (type !== DeviceType.TABLE && this.tableConnection)
             this.tableConnection.emit(eventName, data);
-        if (type !== DeviceType.TABLET)
+        if (type !== DeviceType.TABLET && this.tabletConnection)
             this.tabletConnection.emit(eventName, data);
-        if (type !== DeviceType.VR)
+        if (type !== DeviceType.VR && this.vrConnection)
             this.vrConnection.emit(eventName, data);
     }
 
@@ -79,6 +79,17 @@ export class DevicesService {
                 throw new Error("Unknow type of device : " + type);
         }
         this.all_connections.push(client);
+    }
+
+    public getDeviceType(socket: Socket): DeviceType {
+        if (this.tableConnection && this.tableConnection.id === socket.id) {
+            return DeviceType.TABLE;
+        } else if (this.tabletConnection && this.tabletConnection.id === socket.id) {
+            return DeviceType.TABLET;
+        } else if (this.vrConnection && this.vrConnection.id === socket.id) {
+            return DeviceType.VR;
+        }
+        throw new Error("Unknow type of device for socket : " + socket.id);
     }
 
     public getAllDevicesConnected(): { table: boolean, tablet: boolean, vr: boolean } {
