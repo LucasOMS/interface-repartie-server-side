@@ -40,8 +40,8 @@ export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('EXPLORE_PLACE')
     explorePlaceWithVr(@MessageBody() data: any) {
-        this.devices.sendToVr('EXPLORE_PLACE', {id_place: 1});
-        this.logger.log("Start exploring place 1 with VR");
+        this.devices.broadcastFrom(DeviceType.TABLE, 'EXPLORE_PLACE', undefined);
+        this.logger.log("Start exploring place with VR and Tablet");
     }
 
     handleConnection(client: Socket, ...args: any[]): any {
