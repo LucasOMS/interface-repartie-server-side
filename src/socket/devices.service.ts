@@ -29,6 +29,9 @@ export class DevicesService {
     }
 
     broadcastFrom(type: DeviceType, eventName, data) {
+        if (!data) {
+            data = {};
+        }
         if (type !== DeviceType.TABLE && this.tableConnection)
             this.tableConnection.emit(eventName, data);
         if (type !== DeviceType.TABLET && this.tabletConnection)
@@ -37,21 +40,21 @@ export class DevicesService {
             this.vrConnection.emit(eventName, data);
     }
 
-    sendToTable(eventName, data = undefined) {
+    sendToTable(eventName, data = {}) {
         if (this.tableConnection)
             this.tableConnection.emit(eventName, data);
         else
             this.logger.error("Try to send a message to an unknown Table device");
     }
 
-    sendToTablet(eventName, data = undefined) {
+    sendToTablet(eventName, data = {}) {
         if (this.tabletConnection)
             this.tabletConnection.emit(eventName, data);
         else
             this.logger.error("Try to send a message to an unknown Tablet device");
     }
 
-    sendToVr(eventName, data = undefined) {
+    sendToVr(eventName, data = {}) {
         if (this.vrConnection)
             this.vrConnection.emit(eventName, data);
         else
@@ -89,7 +92,6 @@ export class DevicesService {
         } else if (this.vrConnection && this.vrConnection.id === socket.id) {
             return DeviceType.VR;
         }
-        throw new Error("Unknow type of device for socket : " + socket.id);
     }
 
     public getAllDevicesConnected(): { table: boolean, tablet: boolean, vr: boolean } {
