@@ -10,4 +10,9 @@ export class MockController {
     fakeClue() {
         this.devices.sendToTable('CLUE_FOUND');
     }
+
+    @Get('/end_talk')
+    fakeTalk() {
+        this.devices.sendToTable('END_TALK');
+    }
 }
