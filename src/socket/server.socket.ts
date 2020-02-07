@@ -4,14 +4,17 @@ import {
     OnGatewayConnection,
     OnGatewayDisconnect,
     SubscribeMessage,
-    WebSocketGateway
+    WebSocketGateway, WebSocketServer
 } from '@nestjs/websockets';
-import {Socket} from 'socket.io';
+import {Server, Socket} from 'socket.io';
 import {Logger} from '@nestjs/common';
 import {DevicesService, DeviceType} from "./devices.service";
+import {PLACES_ID} from "../constants";
 
 @WebSocketGateway(10000)
 export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
+    @WebSocketServer()
+    server: Server;
 
     constructor(public logger: Logger, public devices: DevicesService) {
     }
@@ -39,9 +42,24 @@ export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage('EXPLORE_PLACE')
-    explorePlaceWithVr(@MessageBody() data: any) {
+    explorePlace(@MessageBody() data: { id: number }) {
+        const devices = this.devices.getAllDevicesConnected();
+        if (data.id == PLACES_ID.STADIUM) {
+            this.logger.log(`Start exploring stadium with ${devices.vr ? 'VR' : 'table'}`);
+            if (devices.vr)
+                this.devices.sendToVr('EXPLORE_PLACE', {id: data.id});
+            else
+                this.devices.sendToTable('EXPLORE_PLACE', {id: data.id});
+        } else if (data.id == PLACES_ID.LOCKER_ROOM) {
+            this.logger.log(`Start exploring Locker-room with ${devices.tablet ? 'tablet' : 'table'}`);
+            if (devices.tablet)
+                this.devices.sendToTablet('EXPLORE_PLACE', {id: data.id});
+            else
+                this.devices.sendToTable('EXPLORE_PLACE', {id: data.id});
+        } else {
+            throw new Error(`Unknown place to explore (id: ${data.id})`);
+        }
         this.devices.broadcastFrom(DeviceType.TABLE, 'EXPLORE_PLACE', undefined);
-        this.logger.log("Start exploring place with VR and Tablet");
     }
 
     @SubscribeMessage('CLUE_FOUND')
