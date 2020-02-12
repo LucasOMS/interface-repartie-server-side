@@ -56,16 +56,21 @@ export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
                 this.devices.sendToTablet('EXPLORE_PLACE', {id: data.id});
             else
                 this.devices.sendToTable('EXPLORE_PLACE', {id: data.id});
+        } else if (data.id == PLACES_ID.LOCKER_ROOM_LOCKERS) {
+            this.logger.log(`Start exploring Locker-room (lockers) with ${devices.tablet ? 'tablet' : 'table'}`);
+            if (devices.tablet)
+                this.devices.sendToTablet('EXPLORE_PLACE', {id: data.id});
+            else
+                this.devices.sendToTable('EXPLORE_PLACE', {id: data.id});
         } else {
             throw new Error(`Unknown place to explore (id: ${data.id})`);
         }
-        this.devices.broadcastFrom(DeviceType.TABLE, 'EXPLORE_PLACE', undefined);
     }
 
     @SubscribeMessage('CLUE_FOUND')
-    clueFoundWithVr(@MessageBody() data: any) {
-        this.devices.sendToTable('CLUE_FOUND', undefined);
-        this.logger.log("Clue was found using the vr");
+    clueFound(@MessageBody() data: { clue_id: number }) {
+        this.devices.sendToTable('CLUE_FOUND', data);
+        this.logger.log(`Clue found : ${data.clue_id}`)
     }
 
     handleConnection(client: Socket, ...args: any[]): any {

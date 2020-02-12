@@ -7,9 +7,9 @@ export class MockController {
     constructor(private socket: ServerSocket, private devices: DevicesService, private logger: Logger) {
     }
 
-    @Get('/clue_found')
-    fakeClue() {
-        this.devices.sendToTable('CLUE_FOUND');
+    @Get('/clue_found/:id')
+    fakeClue(@Param('id') clueId: number) {
+        this.devices.sendToTable('CLUE_FOUND', {clue_id: clueId});
     }
 
     @Get('/end_talk')
