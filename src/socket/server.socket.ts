@@ -52,10 +52,11 @@ export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
                 this.devices.sendToTable('EXPLORE_PLACE', {id: data.id});
         } else if (data.id == PLACES_ID.LOCKER_ROOM) {
             this.logger.log(`Start exploring Locker-room with ${devices.tablet ? 'tablet' : 'table'}`);
-            if (devices.tablet)
-                this.devices.sendToTablet('EXPLORE_PLACE', {id: data.id});
-            else
-                this.devices.sendToTable('EXPLORE_PLACE', {id: data.id});
+            this.devices.sendToTablet('EXPLORE_PLACE', {id: data.id});
+            // if (devices.tablet)
+            //     this.devices.sendToTablet('EXPLORE_PLACE', {id: data.id});
+            // else
+            //     this.devices.sendToTable('EXPLORE_PLACE', {id: data.id});
         } else if (data.id == PLACES_ID.LOCKER_ROOM_LOCKERS) {
             this.logger.log(`Start exploring Locker-room (lockers) with ${devices.tablet ? 'tablet' : 'table'}`);
             if (devices.tablet)
