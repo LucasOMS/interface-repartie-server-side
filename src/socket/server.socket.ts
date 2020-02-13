@@ -74,6 +74,11 @@ export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.log(`Clue found : ${data.clue_id}`)
     }
 
+    @SubscribeMessage('END_TALK')
+    finishTalkOnVr() {
+        this.devices.sendToTable('END_TALK');
+    }
+
     handleConnection(client: Socket, ...args: any[]): any {
         this.logger.log(`New client with id ${client.id}`);
         client.emit('REGISTRATION_ASK');
