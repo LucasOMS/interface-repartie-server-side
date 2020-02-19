@@ -21,4 +21,9 @@ export class MockController {
     fakeExplorePlace(@Param('id') id: number) {
         this.socket.explorePlace({id});
     }
+
+    @Get('/end_game')
+    fakeEnd() {
+        this.devices.sendToTable('END_GAME');
+    }
 }
