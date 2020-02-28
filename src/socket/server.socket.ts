@@ -16,6 +16,8 @@ export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
+    shouldSend = true;
+
     constructor(public logger: Logger, public devices: DevicesService) {
     }
 
@@ -76,7 +78,13 @@ export class ServerSocket implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('END_TALK')
     finishTalkOnVr() {
-        this.devices.sendToTable('END_TALK');
+        if (this.shouldSend) {
+            this.devices.sendToTable('END_TALK');
+            this.shouldSend = false;
+            setTimeout(() => {
+                this.shouldSend = true;
+            }, 30000);
+        }
     }
 
     handleConnection(client: Socket, ...args: any[]): any {
